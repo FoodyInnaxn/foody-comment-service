@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,5 +17,7 @@ public class CommentResponse {
     private Long userId;
     private Long recipeId;
     private String content;
+    private Date postedAt;
     private Long parentId;
+    private List<CommentResponse> nestedComments; // Add this field for nested comments
 }
