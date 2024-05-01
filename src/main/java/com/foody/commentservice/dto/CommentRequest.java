@@ -14,8 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentRequest {
-    @NotNull(message = "UserId has to be present")
-    private Long userId;
+
     @NotNull(message = "RecipeId has to be present")
     private Long recipeId;
     @NotBlank(message = "Content has to be present")

@@ -12,27 +12,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/comment")
+@RequestMapping("/comment")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
     private  final WebSocketController wsCtr;
-    @PostMapping
-    public ResponseEntity<CommentResponse> createComment(@RequestBody CommentRequest request) {
-        CommentResponse response = commentService.createComment(request);
+    @PostMapping("/{id}/operations/create")
+    public ResponseEntity<CommentResponse> createComment(@PathVariable("id") Long userId, @RequestBody CommentRequest request) {
+        CommentResponse response = commentService.createComment(request, userId);
         wsCtr.broadcastComment("NEW THJIGN", request.getRecipeId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<CommentResponse> updateComment(@PathVariable Long id, @RequestBody CommentRequest request) {
-        CommentResponse response = commentService.updateComment(id, request);
+    @PutMapping("/{id}/operations/update/{commentId}")
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable("id") Long userId,
+                                                         @PathVariable("commentId") Long commentId, @RequestBody CommentRequest request) {
+        CommentResponse response = commentService.updateComment(userId, commentId, request);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
-        commentService.deleteComment(id);
+    @DeleteMapping("/{id}/operations/delete/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable("id") Long userId,
+                                              @PathVariable("commentId") Long commentId) {
+        commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
     }
 

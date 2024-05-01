@@ -24,21 +24,21 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final CommentRepository commentRepository;
 
-    public CommentResponse createComment(@Valid CommentRequest request) {
-        validateRequest(request);
+    public CommentResponse createComment(@Valid CommentRequest request, Long userId) {
+        validateRequest(request, userId);
 
-        CommentEntity comment = mapToComment(request);
+        CommentEntity comment = mapToComment(request, userId);
         CommentEntity savedComment = commentRepository.save(comment);
         return mapToCommentResponse(savedComment);
     }
 
-    public CommentResponse updateComment(Long id, @Valid CommentRequest request) {
-        validateRequest(request);
+    public CommentResponse updateComment(Long userId, Long commentId, @Valid CommentRequest request) {
+        validateRequest(request, userId);
 
-        CommentEntity existingComment = commentRepository.findById(id)
-                .orElseThrow(() -> new CommentNotFoundException());
+        CommentEntity existingComment = commentRepository.findById(commentId)
+                .orElseThrow(CommentNotFoundException::new);
 
-        existingComment.setUserId(request.getUserId());
+        existingComment.setUserId(userId);
         existingComment.setRecipeId(request.getRecipeId());
         existingComment.setContent(request.getContent());
         existingComment.setPostedAt(request.getPostedAt());
@@ -79,9 +79,9 @@ public class CommentService {
         return commentResponse;
     }
 
-    private CommentEntity mapToComment(CommentRequest request) {
+    private CommentEntity mapToComment(CommentRequest request, Long userId) {
         CommentEntity comment = new CommentEntity();
-        comment.setUserId(request.getUserId());
+        comment.setUserId(userId);
         comment.setRecipeId(request.getRecipeId());
         comment.setContent(request.getContent());
         comment.setParentId(request.getParentId());
@@ -100,8 +100,8 @@ public class CommentService {
         return response;
     }
 
-    private void validateRequest(CommentRequest request) {
-        if (request.getUserId() == null || request.getRecipeId() == null || request.getPostedAt() == null) {
+    private void validateRequest(CommentRequest request, Long userId) {
+        if (userId == null || request.getRecipeId() == null || request.getPostedAt() == null) {
             throw new MissingFieldsException("userId, recipeId, and postedAt must not be null");
         }
     }
