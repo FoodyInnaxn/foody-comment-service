@@ -4,6 +4,7 @@ import com.foody.commentservice.business.CommentService;
 import com.foody.commentservice.business.exceptions.CommentNotFoundException;
 import com.foody.commentservice.dto.CommentRequest;
 import com.foody.commentservice.dto.CommentResponse;
+import com.foody.commentservice.dto.CommentsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,15 +40,16 @@ public class CommentController {
     }
 
     @GetMapping("/recipe/{recipeId}")
-    public ResponseEntity<List<CommentResponse>> getCommentsByRecipeId(
+    public CommentsResponse getCommentsByRecipeId(
             @PathVariable Long recipeId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        List<CommentResponse> comments = commentService.getCommentsByRecipeId(recipeId, page, size);
-        if (comments.isEmpty()) {
+
+        CommentsResponse commentsResponse = commentService.getCommentsByRecipeId(recipeId, page, size);
+        if (commentsResponse.getComments().isEmpty()) {
             throw new CommentNotFoundException();
         }
-        return ResponseEntity.ok(comments);
+        return commentsResponse;
     }
 }

@@ -5,6 +5,7 @@ import com.foody.commentservice.business.exceptions.MissingFieldsException;
 import com.foody.commentservice.configuration.RabbitMQConfig;
 import com.foody.commentservice.dto.CommentRequest;
 import com.foody.commentservice.dto.CommentResponse;
+import com.foody.commentservice.dto.CommentsResponse;
 import com.foody.commentservice.persistence.CommentRepository;
 import com.foody.commentservice.persistence.entity.CommentEntity;
 import jakarta.transaction.Transactional;
@@ -53,14 +54,25 @@ public class CommentService {
         commentRepository.deleteById(id);
     }
 
-    public List<CommentResponse> getCommentsByRecipeId(Long recipeId, int page, int size) {
+    public CommentsResponse getCommentsByRecipeId(Long recipeId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<CommentEntity> commentPage = commentRepository.findTopLevelCommentsByRecipeId(recipeId, pageable);
 
-        return commentPage.getContent().stream()
+        if (commentPage.isEmpty()) {
+            throw new CommentNotFoundException();
+        }
+
+        List<CommentResponse> commentResponse = commentPage.getContent().stream()
                 .map(this::mapCommentWithNested)
-                .collect(Collectors.toList());
+                .toList();
+
+        if (commentResponse.isEmpty()) {
+            throw new CommentNotFoundException();
+        }
+
+        return new CommentsResponse(commentResponse, commentPage.getTotalPages());
     }
+
 
     private CommentResponse mapCommentWithNested(CommentEntity topLevelComment) {
         CommentResponse commentResponse = mapToCommentResponse(topLevelComment);
