@@ -15,5 +15,4 @@ spec:
       targetPort: 8083
   selector:
     io.kompose.service: comment-service
-status:
-  loadBalancer: {}
+  type: ClusterIP
