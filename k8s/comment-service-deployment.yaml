@@ -27,7 +27,7 @@ spec:
       containers:
         - env:
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-              value: discovery-service.default.svc.cluster.local:8761
+              value: http://discovery-service:8761/eureka
             - name: POSTGRES_PASSWORD
               value: admin
             - name: POSTGRES_URL
