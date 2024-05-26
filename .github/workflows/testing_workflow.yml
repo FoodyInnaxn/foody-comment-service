@@ -1,4 +1,4 @@
-name: Workflow Testing
+name: Testing Workflow
 
 on:
   push:
@@ -8,20 +8,20 @@ on:
 
 jobs:
   qodana:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      checks: write
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
-          fetch-depth: 0  # a full history is required for pull request analysis
-      - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2023.3
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write
+        pull-requests: write
+        checks: write
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
+            fetch-depth: 0  # a full history is required for pull request analysis
+        - name: 'Qodana Scan'
+          uses: JetBrains/qodana-action@v2023.3
+          env:
+            QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
   build:
     runs-on: ubuntu-latest
     needs: qodana
@@ -45,10 +45,17 @@ jobs:
           # Push is a shorthand for --output=type=registry
           push: true
           # List of tags
-          tags: innaxn/foody-comment-service
+          tags: innaxn/foody-comment-service:testing-latest
   redeploy:
       runs-on: self-hosted
       needs: build
       steps:
       - uses: actions/checkout@v4
-      - run: kubectl apply -f ./k8s/.
+        with:
+          fetch-depth: 0
+      - name: Apply Deployment
+        run: kubectl apply -f ./k8s/.
+      - name: Wait 2min (to be replaced with health-check)
+        uses: juliangruber/sleep-action@v2.0.3
+        with:
+          time: 2m
