@@ -36,7 +36,7 @@ spec:
               value: admin
             - name: SPRING_RABBITMQ_HOST
               value: rabbitMQ
-          image: innaxn/foody-comment-service:latest
+          image: innaxn/foody-comment-service:testing-latest
           name: comment-microservice
           ports:
             - containerPort: 8083
