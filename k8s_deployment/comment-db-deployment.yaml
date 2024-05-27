@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: comment-db
+  name: comment-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: comment-db
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/foody-default: "true"
+        io.kompose.service: comment-db
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: comment-db
+            - name: POSTGRES_PASSWORD
+              value: admin
+            - name: POSTGRES_USER
+              value: admin
+          image: postgres:latest
+          name: comment-db
+          ports:
+            - containerPort: 5432
+              hostPort: 5434
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
