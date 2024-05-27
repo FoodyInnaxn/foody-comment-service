@@ -40,36 +40,36 @@ jobs:
       with:
         push: true
         tags: innaxn/foody-comment-service:production-latest
-  # deploy_to_aks:
-  #   runs-on: ubuntu-latest
-  #   needs: build_and_push_docker
-  #   steps:
-  #     - name: Checkout source code 
-  #       uses: actions/checkout@v3
+  deploy_to_aks:
+    runs-on: ubuntu-latest
+    needs: build_and_push_docker
+    steps:
+      - name: Checkout source code 
+        uses: actions/checkout@v3
 
-  #     - name: Azure login
-  #       id: login
-  #       uses: azure/login@v1.4.3
-  #       with:
-  #         creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Azure login
+        id: login
+        uses: azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-  #     - name: Set AKS context
-  #       id: set-context
-  #       uses: azure/aks-set-context@v3
-  #       with:
-  #         resource-group: '${{ secrets.resource_group }}' 
-  #         cluster-name: '${{ secrets.cluster_name }}'
+      - name: Set AKS context
+        id: set-context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: '${{ secrets.resource_group }}' 
+          cluster-name: '${{ secrets.cluster_name }}'
 
-  #     - name: Setup kubectl
-  #       id: install-kubectl
-  #       uses: azure/setup-kubectl@v3
+      - name: Setup kubectl
+        id: install-kubectl
+        uses: azure/setup-kubectl@v3
 
-  #     - name: Deploy to AKS
-  #       id: deploy-aks
-  #       uses: Azure/k8s-deploy@v4
-  #       with:
-  #         namespace: 'default'
-  #         manifests: |
-  #           prod.deployment.yaml
-  #         images: innaxn/foody-comment-service:production-latest
-  #         pull-images: true
+      - name: Deploy to AKS
+        id: deploy-aks
+        uses: Azure/k8s-deploy@v4
+        with:
+          namespace: 'default'
+          manifests: |
+            ./k8s_deployment/
+          images: innaxn/foody-comment-service:production-latest
+          pull-images: true
